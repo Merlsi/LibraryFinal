@@ -2,19 +2,21 @@ from django.db import models
 import uuid
 import datetime
 
+from django.urls import reverse
+
 
 # Create your models here.
 class Book(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     title = models.CharField(max_length=255)
-    description = models.TextField(max_length=500, blank=True)
-    FICTION = 'FI'
-    NON_FICTION = 'NF'
-    ROMANCE = 'RM'
-    SCIENCE = "SC"
-    POETRY = "PR"
-    COOKBOOKS = "CB"
-    MISTERY = "MS"
+    description = models.TextField(max_length=5000, blank=True)
+    FICTION = 'Fiction'
+    NON_FICTION = 'Non-fiction'
+    ROMANCE = 'Romance'
+    SCIENCE = "Science"
+    POETRY = "Poetry"
+    COOKBOOKS = "Cookbook"
+    MISTERY = "Mystery"
     CATEGORIES = [
         (FICTION, 'Fiction'),
         (NON_FICTION, 'Non-fiction'),
@@ -25,16 +27,19 @@ class Book(models.Model):
         (MISTERY, 'Mistery')
     ]
 
-    category = models.CharField(max_length=2, choices=CATEGORIES, default=ROMANCE)
-    cover = models.ImageField(blank=True, null=True, default='img.png')
+    category = models.CharField(max_length=20, choices=CATEGORIES, default=ROMANCE)
+    cover = models.ImageField( blank=True, null=True, default='def.jpg')
     author_id = models.ForeignKey("Author", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('book', kwargs={'book_id': self.pk})
+
 
 class Author(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(blank=True)
     name = models.CharField(max_length=100, db_index=True)
     last_name = models.CharField(max_length=100)
@@ -45,7 +50,7 @@ class Author(models.Model):
 
 
 class Publisher(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(blank=True)
     name = models.CharField(max_length=100, db_index=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -81,7 +86,6 @@ class BookBorrower(models.Model):
     example_id = models.ForeignKey("Example", on_delete=models.CASCADE)
     borrower_id = models.ForeignKey("Borrower", on_delete=models.CASCADE)
 
-    # duration = models.DurationField(datetime.now + datetime.timedelta(days=20, hours=10))
 
     def __str__(self):
         return str(self.id)

@@ -1,5 +1,12 @@
 {% extends 'main.html' %}
-{% block content %}
-<h1>Single Project Template</h1>
 
-{% endblock content %}
+{% block content %}
+    <h1>{{ book.title }}</h1>
+    <h4>{{ book.description }}</h4>
+    <img width =300 src="{{ book.cover.url }}" alt="image">
+    <br>
+    <h4>Categories: {{ book.category }}</h4>
+    <a href="{% url 'book_edit' book.id %}">EDIT</a>
+    <a href="{% url 'book_delete' book.id %}">DELETE</a>
+
+{% endblock %}
