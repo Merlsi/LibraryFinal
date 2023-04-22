@@ -9,7 +9,6 @@
         <td><a href="{% url 'book' book.id %}">{{ book.title }}</a></td>
         <td>{{ book.category }}</td>
         <td><img width='200' src="{{ book.cover.url }}" alt=""></td>
-{#        <td><a href="{% url 'book_edit' book.pk %}">EDIT</a></td>#}
 
     </tr>
 {% endfor %}

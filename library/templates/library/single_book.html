@@ -6,7 +6,7 @@
     <img width =300 src="{{ book.cover.url }}" alt="image">
     <br>
     <h4>Categories: {{ book.category }}</h4>
-    <a href="{% url 'book_edit' book.id %}">EDIT</a>
-    <a href="{% url 'book_delete' book.id %}">DELETE</a>
+    <p class="link-read-post"><a href="{% url 'book_edit' book.id %}">EDIT</a></p>
+    <p class="link-read-post"><a href="{% url 'book_delete' book.id %}">DELETE</a></p>
 
 {% endblock %}

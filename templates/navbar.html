@@ -1,3 +1,42 @@
-<h1>LOGO</h1>
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
 <a href="{% url 'create-book' %}">Add book</a>
 <hr>
+
+<body>
+	{% block mainmenu %}
+	<div class="header">
+		<ul id="mainmenu" class="mainmenu">
+
+		<li><a href="{% url 'books' %}">Books</a></li>
+		<li><a href="{% url 'publisher' %}">Publishers</a></li>
+		<li><a href="{% url 'author' %}">Authors</a></li>
+{#		{% if request.user.is_authenticated %} #}
+{#		<li class=" last">{{user.username}} | <a href="{% url 'logout' %}">Logout</a></li>#}
+{#		{% else %}#}
+{#		<li><a href="{%url 'register' %}">Register</a> | <a href="{% url 'login' %}">Login</a></li>#}
+{#		{% endif %}#}
+		</ul>
+		<div class="clear"></div>
+	</div>
+{% endblock mainmenu %}
+
+{% block breadcrumbs %}
+{% endblock %}
+<div class="clear"></div>
+
+<div class="content-text">
+{% block content %}
+{% endblock %}
+</div>
+
+</body>
+</html>

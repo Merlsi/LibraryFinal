@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content %}
+<a href="{% url 'create_publisher' %}">Add publisher</a>
+    <h1>Publishers' List</h1>
+    {% for pub in object_list %}
+    <li>
+    <h3>Publisher: {{pub.name}}</h3>
+    <img width='300' src="{{ pub.profile_img.url }}" alt="">
+    <h4>Gmail: {{pub.email}}</h4>
+    <p class="link-read-post"><a href="{% url 'publisher_edit' pub.id %}">EDIT</a></p>
+    <p class="link-read-post"><a href="{% url 'publisher_delete' pub.id %}">DELETE</a></p>
+    </li>
+    {% endfor %}
+{% endblock content %}
