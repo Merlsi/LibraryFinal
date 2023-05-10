@@ -17,5 +17,15 @@ urlpatterns = [
     path('publishers/', views.PublisherList.as_view(), name="publisher"),
     path('publisher_edit/<str:pk>', views.PublisherUpdateView.as_view(), name='publisher_edit'),
     path('delete-publisher/<uuid:id>/', views.PublisherDeleteView.as_view(), name='publisher_delete')
-
+    path('example-list/<str:book>', views.ExampleListView.as_view(), name='example_list'),
+    path('example-detail/<str:pk>/', views.ExampleDetailView.as_view(), name='example_detail'),
+    path('borrow-create/<str:example>/', views.BorrowCreateView.as_view(), name='borrow-create'),
+    path('borrowers-list', views.BorrowerListView.as_view(), name='borrower-list'),
+    path('borrower-create', views.BorrowerCreateView.as_view(), name='borrower-create'),
+    path('borrower-detail/<str:pk>', views.BorrowerDetailView.as_view(), name='borrower_detail'),
+    path('clear-fine/<str:pk>', views.clear_fine, name='clear_fine'),
+    path('end-borrow/<str:pk>', views.end_borrow, name='end_borrow')
 ]
+
+
+
