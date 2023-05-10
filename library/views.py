@@ -6,7 +6,8 @@ from django.urls import reverse_lazy
 from .forms import *
 from .models import *
 from .utils import DataMixin
-
+from django.utils import timezone as tz
+    
 
 # Create your views here.
 def index(request):
@@ -113,3 +114,111 @@ class PublisherDeleteView(DeleteView):
     success_url = reverse_lazy('publisher')
     slug_field = 'id'
     slug_url_kwarg = 'id'
+class ExampleListView(ListView):
+    # model = Example
+    template_name = 'library/example_list.html'
+    context_object_name = 'examples'
+
+    def get_queryset(self):
+        book = self.kwargs['book']
+        print(book)
+        examples = Example.objects.filter(book=book)
+        print(examples)
+        return examples
+
+
+class ExampleDetailView(DetailView):
+    template_name = 'library/example-detail.html'
+    context_object_name = 'example'
+    model = Example
+
+
+class BorrowCreateView(CreateView):
+    model = BookBorrower
+    fields = ['borrower']
+    success_url = reverse_lazy('books')
+    template_name = 'library/book_form.html'
+
+    def form_valid(self, form):
+        try:
+            last_borrow = BookBorrower.objects.filter(borrower=form.instance.borrower).latest('end')
+        except:
+            last_borrow = None
+        if form.instance.borrower.debt:
+            form.add_error('borrower', 'The user has\'t paid the fine')
+
+            return self.form_invalid(form)
+
+        if last_borrow is not None and last_borrow.status:
+            form.add_error('borrower', 'The user has already borrowed a book')
+
+            return self.form_invalid(form)
+        print(self.kwargs['example'])
+        exemplar = Example.objects.get(id=self.kwargs['example'])
+        exemplar.status = 0
+        exemplar.save()
+
+        form.instance.example = exemplar
+
+        response = super().form_valid(form)
+        return response
+
+
+class BorrowerListView(ListView):
+    model = Borrower
+    template_name = 'library/borrower-list.html'
+    context_object_name = 'borrowers'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        for borrow in BookBorrower.objects.filter(status=1):
+            borrow.calculate_fine()
+        return queryset
+
+
+class BorrowerCreateView(CreateView):
+    model = User
+    form_class = MyUserCreationForm
+    template_name = 'library/CRUD/create_book.html'
+    success_url = reverse_lazy('books')
+
+    def test_func(self):
+        return self.request.user.has_perm('library.create_borrower')
+
+    def form_valid(self, form):
+        password = User.objects.make_random_password()
+
+        user = form.save()
+        # user.save()
+
+        borrower = Borrower(user=user)
+        borrower.save()
+
+        response = super().form_valid(form)
+        return response
+
+
+class BorrowerDetailView(DetailView):
+    model = Borrower
+    template_name = 'library/borrower-detail.html'
+    context_object_name = 'borrower'
+
+
+def clear_fine(request, pk):
+    borrower = Borrower.objects.get(borrower_id=pk)
+    borrower.debt = 0
+    borrower.save()
+
+    return redirect('borrower_detail', pk=borrower.borrower_id)
+
+
+def end_borrow(request, pk):
+    borrower = Borrower.objects.get(borrower_id=pk)
+
+    last_borrow = BookBorrower.objects.filter(borrower=borrower).latest('end')
+    last_borrow.end = tz.now()
+    last_borrow.status = 0
+    last_borrow.save()
+
+    return redirect('borrower_detail', pk=pk)
