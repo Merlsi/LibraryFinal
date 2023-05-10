@@ -1,8 +1,10 @@
 from django.db import models
 import uuid
-import datetime
-
+from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
+
 
 
 # Create your models here.
@@ -29,7 +31,7 @@ class Book(models.Model):
 
     category = models.CharField(max_length=20, choices=CATEGORIES, default=ROMANCE)
     cover = models.ImageField( blank=True, null=True, default='def.jpg')
-    author_id = models.ForeignKey("Author", on_delete=models.SET_NULL, null=True)
+    author = models.ManyToManyField('Author')
 
     def __str__(self):
         return self.title
@@ -61,31 +63,70 @@ class Publisher(models.Model):
 
 
 class Example(models.Model):
+    STATUS_CHOICES = (
+        (0, 'False'),
+        (1, 'True'),
+    )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     book = models.ForeignKey("Book", on_delete=models.CASCADE)
-    publisher = models.ForeignKey("Publisher", on_delete=models.SET_NULL, null=True)
+    publisher = models.OneToOneField("Publisher", on_delete=models.CASCADE, null=True)
     code = models.CharField(max_length=20)
-
-    def __str__(self):
-        return str(self.book)
-
-
+    print_date = models.DateTimeField(auto_now_add=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
+    
+    class Meta:
+        ordering = ['code']
+        
+   def __str__(self):
+        return f"{Book.objects.get(id=self.book.id).title} - {self.code}"
+    
+def get_time():
+    return timezone.now() + timedelta(seconds=5)
+ 
 class Borrower(models.Model):
     borrower_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100)
-    email = models.EmailField(blank=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     debt = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['borrower_id']
 
     def __str__(self):
-        return self.name
+        return f"{self.user.first_name} {self.user.last_name}"
+    
+    def has_exemplar(self):
+        book = self.bookborrower_set.filter(status=1)
 
+        if book:
+            return book.first().exemplar
 
+        return False
+
+    
 class BookBorrower(models.Model):
-    id = models.UUIDField('Example', primary_key=True, default=uuid.uuid4, editable=False)
-    example_id = models.ForeignKey("Example", on_delete=models.CASCADE)
-    borrower_id = models.ForeignKey("Borrower", on_delete=models.CASCADE)
-
+    STATUS_CHOICES = (
+        (0, 'False'),
+        (1, 'True'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    example = models.ForeignKey("Example", on_delete=models.CASCADE)
+    borrower = models.ForeignKey("Borrower", on_delete=models.CASCADE)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
+    start = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    end = models.DateTimeField(blank=True, null=True, default=get_time)
 
     def __str__(self):
-        return str(self.id)
+        # instance = Example.objects.get(id=self.example.id)
+        # borrower = Borrower.objects.get(id=self.borrower.borrower_id)
+        return f'{self.example} {self.borrower}'
+        # return f"{borrower.user.first_name} {borrower.user.last_name} - {instance}"
+
+    def calculate_fine(self):
+        time_now = timezone.now()
+        print(f"Now: {time_now}")
+        print(f"End: {self.end}")
+        delta = (time_now - self.end)
+        print(f"{self.borrower}: {delta}")
+        if delta > timedelta(0):
+            self.borrower.debt = delta.total_seconds()
+            self.borrower.save()
