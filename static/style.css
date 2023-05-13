@@ -44,3 +44,6 @@ p.link-read-post a {
 	color: #fff;
 	text-decoration: none;
 }
+.link-read-post :hover{
+    background-color: rgb(149, 201, 246);
+    color: rgb(49, 49, 123);}
