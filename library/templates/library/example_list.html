@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content %}
+    {{ message }}
+<h1>Examples of the book</h1>
+    {% for example in examples %}
+        <div><a href="{% url 'example_detail' example.id %}">{{ example.book }}</a></div>
+        <div>{{ example.code }}</div>
+        <div>{{ example.publisher }}</div>
+        <div>{{ example.status }}</div>
+        <div>{{ example.print_date }}</div>
+        <hr>
+    {% endfor %}
+
+{% endblock content %}

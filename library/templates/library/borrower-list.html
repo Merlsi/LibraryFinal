@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+{% block content %}
+    {{ message }}
+<h1>Borrowers list {{ test }}</h1>
+    <a class="link-read-post" href="{% url 'borrower-create' %}">Create Borrower</a>
+{% for borrower in borrowers %}
+    <div><a href="{% url 'borrower_detail' borrower.borrower_id %}">{{ borrower }}</a> {{ borrower.debt }}</div>
+
+{% endfor %}
+
+{% endblock content %}
