@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <h1>{{ borrower.user.username }}</h1>
+    <h2>{{ borrower.user.first_name }}</h2>
+    <h3>{{ borrower.user.last_name }}</h3>
+    <h4>{{ borrower.debt }}</h4>
+    <a href="{% url 'clear_fine' borrower.borrower_id %}">Clear fine</a>
+    <a href="{% url 'end_borrow' borrower.borrower_id %}">End borrow</a>
+
+{% endblock %}

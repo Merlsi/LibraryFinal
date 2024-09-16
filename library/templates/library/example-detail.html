@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <h1>{{ example.book }}</h1>
+    <h4>{{ example.code }}</h4>
+    <h4>{{ example.status }}</h4>
+    <h4>{{ example.publisher }}</h4>
+    <h4>{{ example.print_date }}</h4>
+    <a href="{% url 'borrow-create' example.id%} ">Borrow to a student</a>
+{#    <p class="link-read-post"><a href="{% url 'example_list' book.id %}">Examples</a></p>#}
+{#    <p class="link-read-post"><a href="{% url 'book_edit' book.id %}">EDIT</a></p>#}
+{#    <p class="link-read-post"><a href="{% url 'book_delete' book.id %}">DELETE</a></p>#}
+
+{% endblock %}
